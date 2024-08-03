@@ -9,12 +9,11 @@ int main() {
     log4cplus::initialize();
     log4cplus::PropertyConfigurator::doConfigure(std::string(LOG4CPLUS_CONFIG));
     log4cplus::Logger testLogger = log4cplus::Logger::getInstance("TEST");
-    LOG4CPLUS_INFO(testLogger, "constructor");
-    compound::Window window("test", 1200, 500);
-    LOG4CPLUS_INFO(testLogger, "copy constructor");
-    compound::Window window2(window);
-    LOG4CPLUS_INFO(testLogger, "copy assignement");
-    window2 = window;
-    LOG4CPLUS_INFO(testLogger, "destructor");
+    compound::Window testWindow("test", 900, 600);
+    testWindow.makeContextCurrent();
+    while (!testWindow.shouldClose()) {
+        testWindow.pollEvents();
+        testWindow.swapBuffers();
+    }
     return 0;
 }

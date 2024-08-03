@@ -15,7 +15,7 @@ find_package(glfw3 REQUIRED)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(${PROJECT_NAME} STATIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui.cpp
+add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/imgui.cpp
                                    ${CMAKE_CURRENT_SOURCE_DIR}/imgui_demo.cpp
                                    ${CMAKE_CURRENT_SOURCE_DIR}/imgui_draw.cpp
                                    ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_glfw.cpp

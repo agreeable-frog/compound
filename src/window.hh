@@ -17,7 +17,7 @@ public:
 
 private:
     log4cplus::Logger _logger =
-        log4cplus::Logger::getInstance("compound.Window");
+        log4cplus::Logger::getInstance("compound.Window.private");
     std::string _name;
     size_t _width;
     static int _glfwInit;
@@ -27,5 +27,10 @@ private:
     std::map<int, bool> _keyStates;
     static void keyCallback(GLFWwindow* window, int key, int scancode,
                             int action, int mods);
+    void makeContextCurrent();
+    void pollEvents();
+    bool shouldClose() const;
+    void swapBuffers();
+    const std::map<int, bool>& keyStates() const;
 };
 } // namespace compound::impl

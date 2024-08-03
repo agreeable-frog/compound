@@ -13,7 +13,7 @@ class Window;
 class Window {
 private:
     log4cplus::Logger _logger =
-        log4cplus::Logger::getInstance("compound.Window");
+        log4cplus::Logger::getInstance("compound.Window.public");
     std::unique_ptr<impl::Window> _pImpl;
 
 public:
@@ -22,6 +22,7 @@ public:
     Window& operator=(const Window&);
     ~Window();
     void makeContextCurrent();
+    void pollEvents();
     bool shouldClose() const;
     void swapBuffers();
     const std::map<int, bool>& keyStates() const;
