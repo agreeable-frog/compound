@@ -22,6 +22,8 @@ public:
     Window& operator=(const Window&);
     ~Window();
     void makeContextCurrent();
+    void TMPsetViewPortToWindow();
+    void TMPclear();
     void pollEvents();
     bool shouldClose() const;
     void swapBuffers();

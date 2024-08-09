@@ -6,6 +6,8 @@
 #include <string>
 #include <log4cplus/logger.h>
 
+#include "imgui.h"
+
 namespace compound::impl {
 class Window {
     friend ::compound::Window;
@@ -18,9 +20,10 @@ public:
 private:
     log4cplus::Logger _logger =
         log4cplus::Logger::getInstance("compound.Window.private");
+    static int _glfwInit;
+    static GLFWwindow* _mainHandle;
     std::string _name;
     size_t _width;
-    static int _glfwInit;
     size_t _height;
     GLFWwindow* _handle;
     void init();

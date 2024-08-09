@@ -9,31 +9,35 @@
 namespace compound {
 namespace impl {
 int Window::_glfwInit = 0;
+GLFWwindow* Window::_mainHandle = 0;
 void Window::init() {
     if (!_glfwInit) {
         glfwInit();
-        ImGui::CreateContext();
     }
-    _glfwInit++;
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-    _handle =
-        glfwCreateWindow(_width, _height, _name.c_str(), nullptr, nullptr);
+    _handle = glfwCreateWindow(_width, _height, _name.c_str(), 0, _mainHandle);
     if (_handle == nullptr) {
         throw std::runtime_error("Failed to create GLFW window");
     }
+    if (!_glfwInit) {
+        _mainHandle = _handle;
+        glfwMakeContextCurrent(_mainHandle);
+    }
     glfwSetWindowUserPointer(_handle, this);
-    glfwMakeContextCurrent(_handle);
     if (glewInit() != GLEW_OK) {
         throw std::runtime_error("GLEW init failed.");
     }
-    glfwSwapInterval(0); // We will manage the framerate ourselves
+    glfwSwapInterval(1);
     glfwSetKeyCallback(_handle, &Window::keyCallback);
-    // probably not good put not planning for multi window for now
-    ImGui_ImplOpenGL3_Init("#version 330 core");
-    ImGui_ImplGlfw_InitForOpenGL(_handle, true);
+    if (!_glfwInit) {
+        ImGui::CreateContext();
+        ImGui_ImplOpenGL3_Init("#version 330 core");
+        ImGui_ImplGlfw_InitForOpenGL(_handle, true);
+    }
+    _glfwInit++;
 }
 
 Window::Window(const std::string& name, size_t width, size_t height)
@@ -62,7 +66,7 @@ Window::~Window() {
     }
     _glfwInit--;
     if (!_glfwInit) {
-        // probably not good put not planning for multi window for now
+        _mainHandle = 0;
         ImGui_ImplOpenGL3_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
