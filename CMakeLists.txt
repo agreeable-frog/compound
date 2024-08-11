@@ -24,7 +24,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 set(SHADERS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 
-add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc)
+add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/program.cc)
 add_library(bnahabra::renderer ALIAS ${PROJECT_NAME})
 
 add_executable(test-${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/test/main.cc)

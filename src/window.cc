@@ -4,7 +4,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#include <log4cplus/log4cplus.h>
+#include "log4cplus/log4cplus.h"
 
 namespace compound {
 namespace impl {
@@ -37,7 +37,7 @@ void Window::init() {
         ImGui_ImplOpenGL3_Init("#version 330 core");
         ImGui_ImplGlfw_InitForOpenGL(_handle, true);
     }
-    _glfwInit++;
+    ++_glfwInit;
 }
 
 Window::Window(const std::string& name, size_t width, size_t height)
@@ -104,6 +104,14 @@ void Window::swapBuffers() {
 const std::map<int, bool>& Window::keyStates() const {
     return _keyStates;
 }
+
+void Window::TMPsetViewPortToWindow() {
+    glViewport(0, 0, _width, _height);
+}
+
+void Window::TMPclear() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
 } // namespace impl
 
 Window::Window(const std::string& name, size_t width, size_t height)
@@ -140,5 +148,13 @@ void Window::swapBuffers() {
 
 const std::map<int, bool>& Window::keyStates() const {
     return _pImpl->keyStates();
+}
+
+void Window::TMPsetViewPortToWindow() {
+    _pImpl->TMPsetViewPortToWindow();
+}
+
+void Window::TMPclear() {
+    _pImpl->TMPclear();
 }
 } // namespace compound

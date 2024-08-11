@@ -4,7 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <map>
 #include <string>
-#include <log4cplus/logger.h>
+#include "log4cplus/logger.h"
 
 #include "imgui.h"
 
@@ -31,6 +31,8 @@ private:
     static void keyCallback(GLFWwindow* window, int key, int scancode,
                             int action, int mods);
     void makeContextCurrent();
+    void TMPsetViewPortToWindow();
+    void TMPclear();
     void pollEvents();
     bool shouldClose() const;
     void swapBuffers();
