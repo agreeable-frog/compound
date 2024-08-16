@@ -68,6 +68,8 @@ GLuint ShaderModule::id() const {
     return _id;
 }
 
+GLuint Program::_boundId = 0;
+
 void Program::init() {
     _id = glCreateProgram();
     if (_id == 0) throw std::runtime_error("Program creation failed");
@@ -117,12 +119,19 @@ Program& Program::operator=(const Program& other) {
 }
 
 Program::~Program() {
+    if (_boundId == _id) {
+        _boundId = 0;
+    }
     glDeleteProgram(_id);
 }
 
 void Program::bind() {
-    LOG4CPLUS_DEBUG(_logger, "Binding program with id " + std::to_string(_id));
-    glUseProgram(_id);
+    if (_id != _boundId || _boundId == 0 /* in case opengl handle is id 0 */) {
+        LOG4CPLUS_DEBUG(_logger,
+                        "Binding program with id " + std::to_string(_id));
+        glUseProgram(_id);
+        _boundId = _id;
+    }
 }
 } // namespace impl
 
@@ -131,8 +140,8 @@ Program::Program(const std::string& vertShaderPath,
     : _pImpl(new impl::Program(vertShaderPath, fragShaderPath)) {
 }
 
-Program::Program(const Program& other) : _pImpl(new impl::Program(*other._pImpl)) {
-
+Program::Program(const Program& other)
+    : _pImpl(new impl::Program(*other._pImpl)) {
 }
 
 Program& Program::operator=(const Program& other) {
@@ -142,7 +151,6 @@ Program& Program::operator=(const Program& other) {
 }
 
 Program::~Program() {
-
 }
 
 void Program::bind() {

@@ -45,6 +45,7 @@ public:
 private:
     log4cplus::Logger _logger =
         log4cplus::Logger::getInstance("compound.Program.private");
+    static GLuint _boundId;
     GLuint _id;
     std::shared_ptr<const ShaderModule> _pVertShader;
     std::shared_ptr<const ShaderModule> _pFragShader;
