@@ -6,6 +6,9 @@
 namespace compound {
 namespace impl {
 static std::string loadText(const std::string& path) {
+    LOG4CPLUS_DEBUG(
+        log4cplus::Logger::getInstance("compound.ShaderModule.private"),
+        "Loading text in file " + path);
     struct stat s;
     if (!(stat(path.c_str(), &s) == 0 && (s.st_mode & S_IFREG))) {
         throw std::runtime_error(path + "is not a regular file");
@@ -13,6 +16,9 @@ static std::string loadText(const std::string& path) {
     std::ifstream inputSrcFile(path, std::ios::in);
     std::stringstream textStream;
     textStream << inputSrcFile.rdbuf();
+    LOG4CPLUS_DEBUG(
+        log4cplus::Logger::getInstance("compound.ShaderModule.private"),
+        "Loaded text in file " + path);
     return textStream.str();
 }
 
@@ -23,14 +29,14 @@ void ShaderModule::init() {
     src.copy(data, src.size() + 1);
     data[src.size()] = '\0';
     glShaderSource(_id, 1, (const GLchar**)&(data), 0);
-
     GLint compileStatus = GL_TRUE;
     glCompileShader(_id);
     glGetShaderiv(_id, GL_COMPILE_STATUS, &compileStatus);
     if (compileStatus != GL_TRUE) {
         GLint logSize;
         glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &logSize);
-        char* logData = new char(logSize);
+        char* logData = new char[logSize];
+        LOG4CPLUS_DEBUG(_logger, "TEST1");
         glGetShaderInfoLog(_id, logSize, &logSize, logData);
         LOG4CPLUS_FATAL(_logger, std::string("Failed to compile shader :\n") +
                                      std::string(logData));
@@ -41,6 +47,11 @@ void ShaderModule::init() {
 
     delete data;
 }
+
+void ShaderModule::destroy() {
+    glDeleteShader(_id);
+}
+
 ShaderModule::ShaderModule(const std::string& path, ShaderModule::Type type)
     : _path(path), _type(type) {
     init();
@@ -53,7 +64,7 @@ ShaderModule::ShaderModule(const ShaderModule& other)
 
 ShaderModule& ShaderModule::operator=(const ShaderModule& other) {
     if (this == &other) return *this;
-    glDeleteShader(_id);
+    destroy();
     _path = other._path;
     _type = other._type;
     init();
@@ -61,7 +72,7 @@ ShaderModule& ShaderModule::operator=(const ShaderModule& other) {
 }
 
 ShaderModule::~ShaderModule() {
-    glDeleteShader(_id);
+    destroy();
 }
 
 GLuint ShaderModule::id() const {
@@ -90,6 +101,15 @@ void Program::init() {
     }
 }
 
+void Program::destroy() {
+    if (isBound()) _boundId = 0;
+    glDeleteProgram(_id);
+}
+
+bool Program::isBound() const {
+    return _boundId == _id;
+}
+
 Program::Program(std::shared_ptr<const ShaderModule> pVertShader,
                  std::shared_ptr<const ShaderModule> pFragShader)
     : _pVertShader(pVertShader), _pFragShader(pFragShader) {
@@ -102,6 +122,7 @@ Program::Program(const std::string& vertShaderPath,
                                                   ShaderModule::Type::VERTEX)),
       _pFragShader(std::make_shared<ShaderModule>(
           fragShaderPath, ShaderModule::Type::FRAGMENT)) {
+    init();
 }
 
 Program::Program(const Program& other)
@@ -111,7 +132,7 @@ Program::Program(const Program& other)
 
 Program& Program::operator=(const Program& other) {
     if (this == &other) return *this;
-    glDeleteProgram(_id);
+    destroy();
     _pVertShader = other._pVertShader;
     _pFragShader = other._pFragShader;
     init();
@@ -119,14 +140,13 @@ Program& Program::operator=(const Program& other) {
 }
 
 Program::~Program() {
-    if (_boundId == _id) {
-        _boundId = 0;
-    }
-    glDeleteProgram(_id);
+    LOG4CPLUS_TRACE(_logger,
+                    "Destroying program with id : " + std::to_string(_id));
+    destroy();
 }
 
 void Program::bind() {
-    if (_id != _boundId || _boundId == 0 /* in case opengl handle is id 0 */) {
+    if (!isBound()) {
         LOG4CPLUS_DEBUG(_logger,
                         "Binding program with id " + std::to_string(_id));
         glUseProgram(_id);

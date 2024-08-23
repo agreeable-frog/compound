@@ -15,6 +15,7 @@ namespace compound {
         PipelineState& operator=(const PipelineState&);
         ~PipelineState();
         void bind();
+        void TMPdraw(int first, size_t count);
         void setDoCullFace(bool);
         void setDoDepthTest(bool);
         void setClearColor(const glm::vec4&);

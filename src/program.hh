@@ -11,6 +11,7 @@ namespace compound {
 namespace impl {
 class ShaderModule {
     friend Program;
+
 public:
     enum class Type {
         VERTEX = GL_VERTEX_SHADER,
@@ -30,6 +31,7 @@ private:
     Type _type;
     GLuint _id;
     void init();
+    void destroy();
 };
 
 class Program {
@@ -41,18 +43,20 @@ public:
     Program(const Program&);
     Program& operator=(const Program&);
     ~Program();
+    void bind();
+    bool isBound() const;
 
 private:
     log4cplus::Logger _logger =
         log4cplus::Logger::getInstance("compound.Program.private");
-    static GLuint _boundId;
     GLuint _id;
+    static GLuint _boundId;
     std::shared_ptr<const ShaderModule> _pVertShader;
     std::shared_ptr<const ShaderModule> _pFragShader;
     Program(std::shared_ptr<const ShaderModule> pVertShader,
             std::shared_ptr<const ShaderModule> pFragShader);
     void init();
-    void bind();
+    void destroy();
 };
 } // namespace impl
 } // namespace compound
