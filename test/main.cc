@@ -22,10 +22,16 @@ int main() {
     compound::PipelineState testPipelineState{};
     testPipelineState.bind();
     compound::MeshVertexBuffer testVertexBuffer(
-        compound::VertexBuffer::Usage::STATIC);
+        compound::VertexBufferUsage::STATIC);
     testVertexBuffer.bind();
     testVertexBuffer.attrib();
-    testVertexBuffer.TMPPushTriangle();
+    auto& internal = testVertexBuffer.vector();
+    internal.push_back(compound::MeshVertex{glm::vec3{-0.5f, -0.5f, 0.0f},
+                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
+    internal.push_back(compound::MeshVertex{glm::vec3{0.5f, -0.5f, 0.0f},
+                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
+    internal.push_back(compound::MeshVertex{glm::vec3{0.0f, 0.5f, 0.0f},
+                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
     testVertexBuffer.bufferData();
     while (!testWindow.shouldClose()) {
         testWindow.makeContextCurrent();

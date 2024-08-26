@@ -4,33 +4,6 @@
 namespace compound {
 namespace impl {
 
-Vertex::BindingDescriptor MeshVertex::getBindingDescriptor() const {
-    Vertex::BindingDescriptor bindingDescriptor;
-    bindingDescriptor.stride = sizeof(MeshVertex);
-    bindingDescriptor.divisor = 0;
-    return bindingDescriptor;
-}
-
-std::vector<Vertex::AttributeDescriptor> MeshVertex::getAttributeDescriptors()
-    const {
-    std::vector<Vertex::AttributeDescriptor> attributeDescriptors(
-        3, AttributeDescriptor());
-
-    attributeDescriptors[0].location = 0;
-    attributeDescriptors[0].size = 3;
-    attributeDescriptors[0].type = GL_FLOAT;
-    attributeDescriptors[0].normalized = GL_FALSE;
-    attributeDescriptors[0].offset = offsetof(MeshVertex, pos);
-
-    attributeDescriptors[1].location = 1;
-    attributeDescriptors[1].size = 4;
-    attributeDescriptors[1].type = GL_FLOAT;
-    attributeDescriptors[1].normalized = GL_FALSE;
-    attributeDescriptors[1].offset = offsetof(MeshVertex, color);
-
-    return attributeDescriptors;
-}
-
 GLuint VertexBufferBase::_boundId = 0;
 
 template <class T>
@@ -45,7 +18,7 @@ void VertexBuffer<T>::destroy() {
 }
 
 template <class T>
-VertexBuffer<T>::VertexBuffer(::compound::VertexBuffer::Usage usage)
+VertexBuffer<T>::VertexBuffer(::compound::VertexBufferUsage usage)
     : std::vector<T>(), _usage(usage) {
     init();
 }
@@ -88,13 +61,16 @@ bool VertexBuffer<T>::isBound() const {
 
 template <class T>
 void VertexBuffer<T>::attrib() {
+    static std::map<::compound::Vertex::AttributeDescriptor::Type, GLenum>
+        typeToGL = {
+            {::compound::Vertex::AttributeDescriptor::Type::FLOAT, GL_FLOAT}};
     Vertex::BindingDescriptor bindingDescriptor = T().getBindingDescriptor();
     std::vector<Vertex::AttributeDescriptor> attributeDescritors =
         T().getAttributeDescriptors();
     for (const auto& attributeDescriptor : attributeDescritors) {
         glVertexAttribPointer(
             attributeDescriptor.location, attributeDescriptor.size,
-            attributeDescriptor.type, attributeDescriptor.normalized,
+            typeToGL[attributeDescriptor.type], attributeDescriptor.normalized,
             bindingDescriptor.stride, (void*)attributeDescriptor.offset);
         glVertexAttribDivisor(attributeDescriptor.location,
                               bindingDescriptor.divisor);
@@ -104,58 +80,88 @@ void VertexBuffer<T>::attrib() {
 
 template <class T>
 void VertexBuffer<T>::bufferData() {
-    static std::map<::compound::VertexBuffer::Usage, GLenum> usageToGL = {
-        {::compound::VertexBuffer::Usage::STATIC, GL_STATIC_DRAW},
-        {::compound::VertexBuffer::Usage::STREAM, GL_STREAM_DRAW},
-        {::compound::VertexBuffer::Usage::DYNAMIC, GL_DYNAMIC_DRAW}};
+    static std::map<::compound::VertexBufferUsage, GLenum> usageToGL = {
+        {::compound::VertexBufferUsage::STATIC, GL_STATIC_DRAW},
+        {::compound::VertexBufferUsage::STREAM, GL_STREAM_DRAW},
+        {::compound::VertexBufferUsage::DYNAMIC, GL_DYNAMIC_DRAW}};
     glBufferData(GL_ARRAY_BUFFER, this->size() * sizeof(T), this->data(),
                  usageToGL[_usage]);
 }
 
-template <>
-void VertexBuffer<MeshVertex>::TMPPushTriangle() {
-    push_back(MeshVertex{glm::vec3{-0.5f, -0.5f, 0.0f},
-                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
-    push_back(MeshVertex{glm::vec3{0.5f, -0.5f, 0.0f},
-                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
-    push_back(MeshVertex{glm::vec3{0.0f, 0.5f, 0.0f},
-                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
-}
-
-template class VertexBuffer<MeshVertex>; // explicit template instanciation
+template class VertexBuffer<MeshVertex>;
 
 } // namespace impl
 
-MeshVertexBuffer::MeshVertexBuffer(VertexBuffer::Usage usage)
-    : _pImpl(new impl::VertexBuffer<impl::MeshVertex>(usage)) {
+Vertex::BindingDescriptor MeshVertex::getBindingDescriptor() const {
+    Vertex::BindingDescriptor bindingDescriptor;
+    bindingDescriptor.stride = sizeof(MeshVertex);
+    bindingDescriptor.divisor = 0;
+    return bindingDescriptor;
 }
 
-MeshVertexBuffer::MeshVertexBuffer(const MeshVertexBuffer& other)
-    : _pImpl(new impl::VertexBuffer<impl::MeshVertex>(other._pImpl->_usage)) {
+std::vector<Vertex::AttributeDescriptor> MeshVertex::getAttributeDescriptors()
+    const {
+    std::vector<Vertex::AttributeDescriptor> attributeDescriptors(
+        3, AttributeDescriptor());
+
+    attributeDescriptors[0].location = 0;
+    attributeDescriptors[0].size = 3;
+    attributeDescriptors[0].type =
+        ::compound::Vertex::AttributeDescriptor::Type::FLOAT;
+    attributeDescriptors[0].normalized = GL_FALSE;
+    attributeDescriptors[0].offset = offsetof(MeshVertex, pos);
+
+    attributeDescriptors[1].location = 1;
+    attributeDescriptors[1].size = 4;
+    attributeDescriptors[1].type =
+        ::compound::Vertex::AttributeDescriptor::Type::FLOAT;
+    attributeDescriptors[1].normalized = GL_FALSE;
+    attributeDescriptors[1].offset = offsetof(MeshVertex, color);
+
+    return attributeDescriptors;
 }
 
-MeshVertexBuffer& MeshVertexBuffer::operator=(const MeshVertexBuffer& other) {
+template <class T>
+VertexBuffer<T>::VertexBuffer(VertexBufferUsage usage)
+    : _pImpl(new impl::VertexBuffer<T>(usage)) {
+}
+
+template <class T>
+VertexBuffer<T>::VertexBuffer(const VertexBuffer<T>& other)
+    : _pImpl(new impl::VertexBuffer<T>(other._pImpl->_usage)) {
+}
+
+template <class T>
+VertexBuffer<T>& VertexBuffer<T>::operator=(const VertexBuffer<T>& other) {
     if (this == &other) return *this;
     *_pImpl = *other._pImpl;
     return *this;
 }
 
-MeshVertexBuffer::~MeshVertexBuffer() {
+template <class T>
+VertexBuffer<T>::~VertexBuffer() {
 }
 
-void MeshVertexBuffer::bind() {
+template <class T>
+void VertexBuffer<T>::bind() {
     _pImpl->bind();
 }
 
-void MeshVertexBuffer::attrib() {
+template <class T>
+void VertexBuffer<T>::attrib() {
     _pImpl->attrib();
 }
 
-void MeshVertexBuffer::bufferData() {
+template <class T>
+void VertexBuffer<T>::bufferData() {
     _pImpl->bufferData();
 }
 
-void MeshVertexBuffer::TMPPushTriangle() {
-    _pImpl->TMPPushTriangle();
+template <class T>
+std::vector<T>& VertexBuffer<T>::vector() {
+    return dynamic_cast<std::vector<T>&>(*_pImpl);
 }
+
+template class VertexBuffer<MeshVertex>;
+
 } // namespace compound

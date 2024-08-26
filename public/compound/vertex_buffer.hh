@@ -2,37 +2,65 @@
 
 #include <memory>
 #include "log4cplus/log4cplus.h"
+#include "glm/glm.hpp"
 
 namespace compound {
 namespace impl {
-struct MeshVertex;
 template <class T>
 class VertexBuffer;
 } // namespace impl
-class VertexBuffer {
-public:
-    enum class Usage { STATIC, STREAM, DYNAMIC };
-    virtual void bind() = 0;
-    virtual void attrib() = 0;
-    virtual void bufferData() = 0;
+struct Vertex {
+    struct BindingDescriptor {
+        uint stride;
+        uint divisor;
+    };
+
+    struct AttributeDescriptor {
+        uint location;
+        uint size;
+        enum class Type { FLOAT };
+        Type type;
+        bool normalized;
+        size_t offset;
+    };
+    virtual BindingDescriptor getBindingDescriptor() const = 0;
+    virtual std::vector<AttributeDescriptor> getAttributeDescriptors()
+        const = 0;
 };
 
-class MeshVertexBuffer : public VertexBuffer {
-    friend impl::VertexBuffer<impl::MeshVertex>;
-
+struct alignas(16) MeshVertex : public Vertex {
 public:
-    MeshVertexBuffer(VertexBuffer::Usage);
-    MeshVertexBuffer(const MeshVertexBuffer&);
-    MeshVertexBuffer& operator=(const MeshVertexBuffer&);
-    ~MeshVertexBuffer();
-    void bind() override;
-    void attrib() override;
-    void bufferData() override;
-    void TMPPushTriangle();
+    MeshVertex() {
+    }
+    MeshVertex(const glm::vec3& pos, const glm::vec4& color)
+        : pos(pos), color(color) {
+    }
+    BindingDescriptor getBindingDescriptor() const override;
+    std::vector<AttributeDescriptor> getAttributeDescriptors() const override;
+    glm::vec3 pos;
+    glm::vec4 color;
+};
+
+enum class VertexBufferUsage { STATIC, STREAM, DYNAMIC };
+
+template <class T>
+class VertexBuffer {
+public:
+    VertexBuffer(VertexBufferUsage usage);
+    VertexBuffer(const VertexBuffer&);
+    VertexBuffer& operator=(const VertexBuffer&);
+    ~VertexBuffer();
+    void bind();
+    void attrib();
+    void bufferData();
+    std::vector<T>& vector();
 
 private:
     log4cplus::Logger _logger =
         log4cplus::Logger::getInstance("compound.MeshVertexBuffer.public");
-    std::unique_ptr<impl::VertexBuffer<impl::MeshVertex>> _pImpl;
+    std::unique_ptr<impl::VertexBuffer<T>> _pImpl;
 };
+
+typedef VertexBuffer<MeshVertex> MeshVertexBuffer;
+
 } // namespace compound
