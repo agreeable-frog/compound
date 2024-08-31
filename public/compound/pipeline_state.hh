@@ -4,11 +4,13 @@
 #include "glm/glm.hpp"
 
 namespace compound {
+        class VertexBuffer;
     namespace impl {
         class PipelineState;
     }
     class PipelineState {
         friend impl::PipelineState;
+        friend VertexBuffer;
     public:
         PipelineState();
         PipelineState(const PipelineState&);

@@ -9,31 +9,26 @@
 namespace compound {
 namespace impl {
 
-class VertexBufferBase {
-protected:
-    static GLuint _boundId;
-};
-
-template <class T>
-class VertexBuffer : public std::vector<T>, public VertexBufferBase {
-    friend ::compound::MeshVertexBuffer;
+class VertexBuffer {
+    friend ::compound::VertexBuffer;
 
 public:
-    VertexBuffer(::compound::VertexBufferUsage usage);
+    VertexBuffer(::compound::VertexBuffer::Usage);
     VertexBuffer(const VertexBuffer&);
     VertexBuffer& operator=(const VertexBuffer&);
     ~VertexBuffer();
     void bind();
     bool isBound() const;
-    void attrib();
-    void bufferData();
-    void TMPPushTriangle();
+    void attrib(const PipelineState&, ::compound::Vertex::Descriptor);
+    void bufferData(const void*, size_t);
 
 protected:
     log4cplus::Logger _logger =
         log4cplus::Logger::getInstance("compound.VertexBuffer.private");
     GLuint _id;
-    ::compound::VertexBufferUsage _usage;
+    static GLuint _boundId;
+    ::compound::VertexBuffer::Usage _usage;
+    ::compound::Vertex::Descriptor _descriptor;
     void init();
     void destroy();
 };

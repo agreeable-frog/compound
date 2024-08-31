@@ -21,18 +21,20 @@ int main() {
                                   std::string(SHADERS_PATH) + "basic.frag");
     compound::PipelineState testPipelineState{};
     testPipelineState.bind();
-    compound::MeshVertexBuffer testVertexBuffer(
-        compound::VertexBufferUsage::STATIC);
+    compound::VertexBuffer testVertexBuffer(
+        compound::VertexBuffer::Usage::STATIC);
     testVertexBuffer.bind();
-    testVertexBuffer.attrib();
-    auto& internal = testVertexBuffer.vector();
+    testVertexBuffer.attrib(testPipelineState,
+                            compound::MeshVertex().getDescriptor());
+    std::vector<compound::MeshVertex> internal;
     internal.push_back(compound::MeshVertex{glm::vec3{-0.5f, -0.5f, 0.0f},
-                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
+                                            glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
     internal.push_back(compound::MeshVertex{glm::vec3{0.5f, -0.5f, 0.0f},
-                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
+                                            glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
     internal.push_back(compound::MeshVertex{glm::vec3{0.0f, 0.5f, 0.0f},
-                         glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
-    testVertexBuffer.bufferData();
+                                            glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
+    testVertexBuffer.bufferData(
+        internal.data(), internal.size() * compound::MeshVertex().size());
     while (!testWindow.shouldClose()) {
         testWindow.makeContextCurrent();
         testWindow.pollEvents();
