@@ -1,6 +1,6 @@
 #include "compound/window.hh"
 #include "compound/program.hh"
-#include "compound/pipeline_state.hh"
+#include "compound/pipeline.hh"
 #include "compound/vertex_buffer.hh"
 
 #include <iostream>
@@ -19,12 +19,12 @@ int main() {
     testWindow.makeContextCurrent();
     compound::Program testProgram(std::string(SHADERS_PATH) + "basic.vert",
                                   std::string(SHADERS_PATH) + "basic.frag");
-    compound::PipelineState testPipelineState{};
-    testPipelineState.bind();
+    compound::Pipeline testPipeline{};
+    testPipeline.bind();
     compound::VertexBuffer testVertexBuffer(
         compound::VertexBuffer::Usage::STATIC);
     testVertexBuffer.bind();
-    testVertexBuffer.attrib(testPipelineState,
+    testVertexBuffer.attrib(testPipeline,
                             compound::MeshVertex().getDescriptor());
     std::vector<compound::MeshVertex> internal;
     internal.push_back(compound::MeshVertex{glm::vec3{-0.5f, -0.5f, 0.0f},
@@ -33,15 +33,17 @@ int main() {
                                             glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
     internal.push_back(compound::MeshVertex{glm::vec3{0.0f, 0.5f, 0.0f},
                                             glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
-    testVertexBuffer.bufferData(
-        internal.data(), internal.size() * compound::MeshVertex().size());
+    testVertexBuffer.bufferData(internal.data(),
+                                internal.size() * compound::MeshVertex().size(),
+                                compound::MeshVertex().getDescriptor());
+    internal.clear();
     while (!testWindow.shouldClose()) {
         testWindow.makeContextCurrent();
         testWindow.pollEvents();
         testWindow.TMPsetViewPortToWindow();
         testWindow.TMPclear();
         testProgram.bind();
-        testPipelineState.TMPdraw(0, 3);
+        testPipeline.TMPdraw(0, 3);
         testWindow.swapBuffers();
     }
     return 0;

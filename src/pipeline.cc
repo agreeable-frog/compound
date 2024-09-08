@@ -1,30 +1,30 @@
-#include "compound/pipeline_state.hh"
-#include "pipeline_state.hh"
+#include "compound/pipeline.hh"
+#include "pipeline.hh"
 
 namespace compound {
 namespace impl {
-GLuint PipelineState::_boundId = 0;
-void PipelineState::init() {
+GLuint Pipeline::_boundId = 0;
+void Pipeline::init() {
     glGenVertexArrays(1, &_id);
 }
 
-void PipelineState::destroy() {
+void Pipeline::destroy() {
     if (isBound()) _boundId = 0;
     glDeleteVertexArrays(1, &_id);
 }
 
-PipelineState::PipelineState() {
+Pipeline::Pipeline() {
     init();
 }
 
-PipelineState::PipelineState(const PipelineState& other)
+Pipeline::Pipeline(const Pipeline& other)
     : _doCullFace(other._doCullFace),
       _doDepthTest(other._doDepthTest),
       _clearColor(other._clearColor) {
     init();
 }
 
-PipelineState& PipelineState::operator=(const PipelineState& other) {
+Pipeline& Pipeline::operator=(const Pipeline& other) {
     if (this == &other) return *this;
     destroy();
     _doCullFace = other._doCullFace;
@@ -34,11 +34,11 @@ PipelineState& PipelineState::operator=(const PipelineState& other) {
     return *this;
 }
 
-PipelineState::~PipelineState() {
+Pipeline::~Pipeline() {
     destroy();
 }
 
-void PipelineState::bind() {
+void Pipeline::bind() {
     if (!isBound()) {
         LOG4CPLUS_DEBUG(_logger,
                         "Binding vao with id : " + std::to_string(_id));
@@ -53,60 +53,60 @@ void PipelineState::bind() {
     }
 }
 
-void PipelineState::TMPdraw(int first, size_t count) {
+void Pipeline::TMPdraw(int first, size_t count) {
     glDrawArrays(GL_TRIANGLES, first, count);
 }
 
-void PipelineState::setDoCullFace(bool doCullFace) {
+void Pipeline::setDoCullFace(bool doCullFace) {
     _doCullFace = doCullFace;
 }
 
-void PipelineState::setDoDepthTest(bool doDepthTest) {
+void Pipeline::setDoDepthTest(bool doDepthTest) {
     _doDepthTest = doDepthTest;
 }
 
-void PipelineState::setClearColor(const glm::vec4& color) {
+void Pipeline::setClearColor(const glm::vec4& color) {
     _clearColor = color;
 }
 
-bool PipelineState::isBound() const {
+bool Pipeline::isBound() const {
     return _boundId == _id;
 }
 } // namespace impl
 
-PipelineState::PipelineState() : _pImpl(new impl::PipelineState()) {
+Pipeline::Pipeline() : _pImpl(new impl::Pipeline()) {
 }
 
-PipelineState::PipelineState(const PipelineState& other)
-    : _pImpl(new impl::PipelineState(*other._pImpl)) {
+Pipeline::Pipeline(const Pipeline& other)
+    : _pImpl(new impl::Pipeline(*other._pImpl)) {
 }
 
-PipelineState& PipelineState::operator=(const PipelineState& other) {
+Pipeline& Pipeline::operator=(const Pipeline& other) {
     if (this == &other) return *this;
     *_pImpl = *other._pImpl;
     return *this;
 }
 
-PipelineState::~PipelineState() {
+Pipeline::~Pipeline() {
 }
 
-void PipelineState::bind() {
+void Pipeline::bind() {
     _pImpl->bind();
 }
 
-void PipelineState::TMPdraw(int first, size_t count) {
+void Pipeline::TMPdraw(int first, size_t count) {
     _pImpl->TMPdraw(first, count);
 }
 
-void PipelineState::setDoCullFace(bool doCullFace) {
+void Pipeline::setDoCullFace(bool doCullFace) {
     _pImpl->setDoCullFace(doCullFace);
 }
 
-void PipelineState::setDoDepthTest(bool doDepthTest) {
+void Pipeline::setDoDepthTest(bool doDepthTest) {
     _pImpl->setDoDepthTest(doDepthTest);
 }
 
-void PipelineState::setClearColor(const glm::vec4& color) {
+void Pipeline::setClearColor(const glm::vec4& color) {
     _pImpl->setClearColor(color);
 }
 } // namespace compound

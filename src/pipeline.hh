@@ -7,13 +7,13 @@
 
 namespace compound {
 namespace impl {
-class PipelineState {
-    friend ::compound::PipelineState;
+class Pipeline {
+    friend ::compound::Pipeline;
 public:
-    PipelineState();
-    PipelineState(const PipelineState&);
-    PipelineState& operator=(const PipelineState&);
-    ~PipelineState();
+    Pipeline();
+    Pipeline(const Pipeline&);
+    Pipeline& operator=(const Pipeline&);
+    ~Pipeline();
     void bind();
     void TMPdraw(int first, size_t count);
     bool isBound() const;
@@ -21,7 +21,7 @@ public:
     void setDoDepthTest(bool);
     void setClearColor(const glm::vec4&);
 private:
-    log4cplus::Logger _logger = log4cplus::Logger::getInstance("compound.PipelineState.private");
+    log4cplus::Logger _logger = log4cplus::Logger::getInstance("compound.Pipeline.private");
     GLuint _id;
     static GLuint _boundId;
     bool _doCullFace = true;

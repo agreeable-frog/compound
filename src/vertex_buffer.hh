@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pipeline.hh"
 #include "log4cplus/log4cplus.h"
 #include "glm/glm.hpp"
 #include <GL/glew.h>
@@ -19,8 +20,8 @@ public:
     ~VertexBuffer();
     void bind();
     bool isBound() const;
-    void attrib(const PipelineState&, ::compound::Vertex::Descriptor);
-    void bufferData(const void*, size_t);
+    void attrib(const Pipeline&, ::compound::Vertex::Descriptor);
+    void bufferData(const void*, size_t, ::compound::Vertex::Descriptor);
 
 protected:
     log4cplus::Logger _logger =

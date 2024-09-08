@@ -26,8 +26,9 @@ set(SHADERS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 
 add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/program.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pipeline_state.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_buffer.cc)
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pipeline.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_buffer.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/index_buffer.cc)
 add_library(bnahabra::renderer ALIAS ${PROJECT_NAME})
 
 add_executable(test-${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/test/main.cc)

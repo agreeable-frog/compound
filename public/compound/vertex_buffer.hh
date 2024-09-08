@@ -1,6 +1,6 @@
 #pragma once
 
-#include "compound/pipeline_state.hh"
+#include "compound/pipeline.hh"
 #include <memory>
 #include "log4cplus/log4cplus.h"
 #include "glm/glm.hpp"
@@ -32,18 +32,15 @@ struct Vertex {
 
 class VertexBuffer {
 public:
-    enum class Usage {
-        STATIC,
-        STREAM,
-        DYNAMIC
-    };
+    enum class Usage { STATIC, STREAM, DYNAMIC };
     VertexBuffer(Usage);
     VertexBuffer(const VertexBuffer&);
     VertexBuffer& operator=(const VertexBuffer&);
     ~VertexBuffer();
     void bind();
-    void attrib(const PipelineState&, Vertex::Descriptor);
-    void bufferData(const void* data, size_t size);
+    void attrib(const Pipeline&, Vertex::Descriptor);
+    void bufferData(const void* data, size_t size,
+                    Vertex::Descriptor descriptor);
 
 private:
     log4cplus::Logger _logger =
