@@ -53,8 +53,8 @@ void Pipeline::bind() {
     }
 }
 
-void Pipeline::TMPdraw(int first, size_t count) {
-    glDrawArrays(GL_TRIANGLES, first, count);
+void Pipeline::drawElements(size_t count, size_t offset) {
+    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, (void*)(offset * sizeof(uint32_t)));
 }
 
 void Pipeline::setDoCullFace(bool doCullFace) {
@@ -94,8 +94,8 @@ void Pipeline::bind() {
     _pImpl->bind();
 }
 
-void Pipeline::TMPdraw(int first, size_t count) {
-    _pImpl->TMPdraw(first, count);
+void Pipeline::drawElements(size_t count, size_t offset) {
+    _pImpl->drawElements(count, offset);
 }
 
 void Pipeline::setDoCullFace(bool doCullFace) {

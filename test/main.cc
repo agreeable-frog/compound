@@ -2,6 +2,7 @@
 #include "compound/program.hh"
 #include "compound/pipeline.hh"
 #include "compound/vertex_buffer.hh"
+#include "compound/index_buffer.hh"
 
 #include <iostream>
 #include "log4cplus/configurator.h"
@@ -23,6 +24,7 @@ int main() {
     testPipeline.bind();
     compound::VertexBuffer testVertexBuffer(
         compound::VertexBuffer::Usage::STATIC);
+    compound::IndexBuffer testIndexBuffer(compound::IndexBuffer::Usage::STATIC);
     testVertexBuffer.bind();
     testVertexBuffer.attrib(testPipeline,
                             compound::MeshVertex().getDescriptor());
@@ -36,6 +38,8 @@ int main() {
     testVertexBuffer.bufferData(internal.data(),
                                 internal.size() * compound::MeshVertex().size(),
                                 compound::MeshVertex().getDescriptor());
+    testIndexBuffer.bind();
+    testIndexBuffer.bufferData({0, 1, 2});
     internal.clear();
     while (!testWindow.shouldClose()) {
         testWindow.makeContextCurrent();
@@ -43,7 +47,7 @@ int main() {
         testWindow.TMPsetViewPortToWindow();
         testWindow.TMPclear();
         testProgram.bind();
-        testPipeline.TMPdraw(0, 3);
+        testPipeline.drawElements(3, 0);
         testWindow.swapBuffers();
     }
     return 0;

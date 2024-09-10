@@ -15,7 +15,7 @@ public:
     Pipeline& operator=(const Pipeline&);
     ~Pipeline();
     void bind();
-    void TMPdraw(int first, size_t count);
+    void drawElements(size_t count, size_t offset);
     bool isBound() const;
     void setDoCullFace(bool);
     void setDoDepthTest(bool);
