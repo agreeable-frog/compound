@@ -48,17 +48,4 @@ private:
     std::unique_ptr<impl::VertexBuffer> _pImpl;
 };
 
-struct alignas(16) MeshVertex : public Vertex {
-public:
-    MeshVertex() {
-    }
-    MeshVertex(const glm::vec3& pos, const glm::vec4& color)
-        : pos(pos), color(color) {
-    }
-    const Descriptor getDescriptor() const override;
-    size_t size() const override;
-    glm::vec3 pos;
-    glm::vec4 color;
-};
-
 } // namespace compound

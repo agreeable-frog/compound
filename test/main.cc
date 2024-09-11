@@ -3,6 +3,7 @@
 #include "compound/pipeline.hh"
 #include "compound/vertex_buffer.hh"
 #include "compound/index_buffer.hh"
+#include "compound/mesh.hh"
 
 #include <iostream>
 #include "log4cplus/configurator.h"

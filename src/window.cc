@@ -18,6 +18,8 @@ void Window::init() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glDisable(GL_MULTISAMPLE);
+    glfwWindowHint(GLFW_SAMPLES, 1); // disable MSAA
     _handle = glfwCreateWindow(_width, _height, _name.c_str(), 0, _mainHandle);
     if (_handle == nullptr) {
         throw std::runtime_error("Failed to create GLFW window");
