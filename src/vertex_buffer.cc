@@ -66,7 +66,8 @@ void VertexBuffer::attrib(const Pipeline& pipelineState,
     for (const auto& attributeDescriptor : attributeDescritors) {
         glVertexAttribPointer(
             attributeDescriptor.location, attributeDescriptor.size,
-            typeToGL[attributeDescriptor.type], attributeDescriptor.normalized,
+            typeToGL[attributeDescriptor.type],
+            attributeDescriptor.normalized ? GL_TRUE : GL_FALSE,
             bindingDescriptor.stride, (void*)attributeDescriptor.offset);
         glVertexAttribDivisor(attributeDescriptor.location,
                               bindingDescriptor.divisor);
@@ -94,34 +95,6 @@ void VertexBuffer::bufferData(const void* data, size_t size,
     glBufferData(GL_ARRAY_BUFFER, size, data, usageToGL[_usage]);
 }
 } // namespace impl
-
-const Vertex::Descriptor MeshVertex::getDescriptor() const {
-    Descriptor descriptor;
-    descriptor.bindingDescriptor.stride = sizeof(MeshVertex);
-    descriptor.bindingDescriptor.divisor = 0;
-
-    std::vector<Vertex::AttributeDescriptor> attributeDescriptors(
-        3, AttributeDescriptor());
-
-    attributeDescriptors[0].location = 0;
-    attributeDescriptors[0].size = 3;
-    attributeDescriptors[0].type = Vertex::AttributeDescriptor::Type::FLOAT;
-    attributeDescriptors[0].normalized = GL_FALSE;
-    attributeDescriptors[0].offset = offsetof(MeshVertex, pos);
-
-    attributeDescriptors[1].location = 1;
-    attributeDescriptors[1].size = 4;
-    attributeDescriptors[1].type = Vertex::AttributeDescriptor::Type::FLOAT;
-    attributeDescriptors[1].normalized = GL_FALSE;
-    attributeDescriptors[1].offset = offsetof(MeshVertex, color);
-
-    descriptor.attributeDescriptors = attributeDescriptors;
-    return descriptor;
-}
-
-size_t MeshVertex::size() const {
-    return sizeof(MeshVertex);
-}
 
 VertexBuffer::VertexBuffer(VertexBuffer::Usage usage)
     : _pImpl(new impl::VertexBuffer(usage)) {
