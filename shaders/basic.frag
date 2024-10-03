@@ -5,10 +5,8 @@
 #extension GL_ARB_separate_shader_objects : require
 #extension GL_ARB_explicit_uniform_location : require
 
-layout(location = 0) in vec4 color;
-
 layout(location = 0) out vec4 outFragColor;
 
 void main() {
-    outFragColor = color;
+    outFragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

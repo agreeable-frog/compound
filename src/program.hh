@@ -45,6 +45,9 @@ public:
     ~Program();
     void bind();
     bool isBound() const;
+    void setUniform(int location, const glm::mat4& data);
+    void setUniform(int location, const glm::vec4& data);
+    void setUniform(int location, float data);
 
 private:
     log4cplus::Logger _logger =

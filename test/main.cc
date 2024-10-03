@@ -4,6 +4,7 @@
 #include "compound/vertex_buffer.hh"
 #include "compound/index_buffer.hh"
 #include "compound/mesh.hh"
+#include "compound/camera.hh"
 
 #include <iostream>
 #include "log4cplus/configurator.h"
@@ -23,32 +24,31 @@ int main() {
                                   std::string(SHADERS_PATH) + "basic.frag");
     compound::Pipeline testPipeline{};
     testPipeline.bind();
-    compound::VertexBuffer testVertexBuffer(
-        compound::VertexBuffer::Usage::STATIC);
-    compound::IndexBuffer testIndexBuffer(compound::IndexBuffer::Usage::STATIC);
-    testVertexBuffer.bind();
-    testVertexBuffer.attrib(testPipeline,
-                            compound::MeshVertex().getDescriptor());
-    std::vector<compound::MeshVertex> internal;
-    internal.push_back(compound::MeshVertex{glm::vec3{-0.5f, -0.5f, 0.0f},
-                                            glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
-    internal.push_back(compound::MeshVertex{glm::vec3{0.5f, -0.5f, 0.0f},
-                                            glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
-    internal.push_back(compound::MeshVertex{glm::vec3{0.0f, 0.5f, 0.0f},
-                                            glm::vec4{1.0f, 0.0f, 0.0f, 1.0f}});
-    testVertexBuffer.bufferData(internal.data(),
-                                internal.size() * compound::MeshVertex().size(),
-                                compound::MeshVertex().getDescriptor());
-    testIndexBuffer.bind();
-    testIndexBuffer.bufferData({0, 1, 2});
-    internal.clear();
+    std::shared_ptr<compound::VertexBuffer> pTestVertexBuffer =
+        std::make_shared<compound::VertexBuffer>(
+            compound::VertexBuffer::Usage::STATIC);
+    std::shared_ptr<compound::IndexBuffer> pTestIndexBuffer =
+        std::make_shared<compound::IndexBuffer>(
+            compound::IndexBuffer::Usage::STATIC);
+    pTestVertexBuffer->bind();
+    pTestVertexBuffer->attrib(testPipeline,
+                              compound::MeshVertex().getDescriptor());
+    pTestIndexBuffer->bind();
+    std::shared_ptr<compound::Mesh> cube =
+        std::make_shared<compound::Mesh>(compound::Mesh::Cube());
+    compound::Mesh::loadMeshes({cube}, pTestVertexBuffer, pTestIndexBuffer);
+    compound::Camera camera(glm::vec3{0.0f, 0.0f, -4.0f},
+                            glm::vec3{1.0f, 0.0f, 0.0f},
+                            glm::vec3{0.0f, 0.0f, 1.0f}, 0.1f, 10.0f, M_PI_2);
+    testProgram.bind();
+    testProgram.setUniform(0, camera.projection(1.5f));
+    testProgram.setUniform(1, camera.view());
     while (!testWindow.shouldClose()) {
         testWindow.makeContextCurrent();
         testWindow.pollEvents();
         testWindow.TMPsetViewPortToWindow();
         testWindow.TMPclear();
-        testProgram.bind();
-        testPipeline.drawElements(3, 0);
+        testPipeline.drawElements(cube->nbIndices(), cube->indexBufferOffset());
         testWindow.swapBuffers();
     }
     return 0;

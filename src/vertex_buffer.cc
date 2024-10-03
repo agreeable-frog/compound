@@ -53,6 +53,10 @@ bool VertexBuffer::isBound() const {
 
 void VertexBuffer::attrib(const Pipeline& pipelineState,
                           Vertex::Descriptor descriptor) {
+    if (!isBound()) {
+        LOG4CPLUS_FATAL(_logger, "Trying to attrib not bound vertex buffer");
+        throw std::runtime_error("Trying to attrib not bound vertex buffer");
+    }
     if (!pipelineState.isBound()) {
         LOG4CPLUS_FATAL(_logger, "Attrib vertex buffer on not bound vao");
         throw std::runtime_error("Attrib vertex buffer on not bound vao");
@@ -84,13 +88,7 @@ void VertexBuffer::bufferData(const void* data, size_t size,
     if (!isBound()) {
         LOG4CPLUS_FATAL(_logger,
                         "Trying to buffer data in a not bound vertex buffer");
-        throw std::runtime_error("buffer data in not bound vertex buffer");
-    }
-    if (descriptor.bindingDescriptor.stride !=
-        _descriptor.bindingDescriptor.stride) {
-        LOG4CPLUS_WARN(_logger,
-                       "Descriptor attribed on this vertex doesnt match "
-                       "descriptor given to bufferdata");
+        throw std::runtime_error("buffer data in a not bound vertex buffer");
     }
     glBufferData(GL_ARRAY_BUFFER, size, data, usageToGL[_usage]);
 }

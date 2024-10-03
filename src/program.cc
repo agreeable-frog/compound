@@ -2,6 +2,7 @@
 #include "program.hh"
 
 #include <sys/stat.h>
+#include <glm/gtc/type_ptr.hpp>
 
 namespace compound {
 namespace impl {
@@ -153,6 +154,30 @@ void Program::bind() {
         _boundId = _id;
     }
 }
+
+void Program::setUniform(int location, const glm::mat4& data) {
+    if (!isBound()) {
+        LOG4CPLUS_ERROR(_logger, "Cannot set uniform on not bound program.");
+        return;
+    }
+    glUniformMatrix4fv(location, 1, false, glm::value_ptr(data));
+}
+
+void Program::setUniform(int location, const glm::vec4& data) {
+    if (!isBound()) {
+        LOG4CPLUS_ERROR(_logger, "Cannot set uniform on not bound program.");
+        return;
+    }
+    glUniform4fv(location, 1, glm::value_ptr(data));
+}
+
+void Program::setUniform(int location, float data) {
+    if (!isBound()) {
+        LOG4CPLUS_ERROR(_logger, "Cannot set uniform on not bound program.");
+        return;
+    }
+    glUniform1fv(location, 1, &data);
+}
 } // namespace impl
 
 Program::Program(const std::string& vertShaderPath,
@@ -175,5 +200,17 @@ Program::~Program() {
 
 void Program::bind() {
     _pImpl->bind();
+}
+
+void Program::setUniform(int location, const glm::mat4& data) {
+    _pImpl->setUniform(location, data);
+}
+
+void Program::setUniform(int location, const glm::vec4& data) {
+    _pImpl->setUniform(location, data);
+}
+
+void Program::setUniform(int location, float data) {
+    _pImpl->setUniform(location, data);
 }
 } // namespace compound
