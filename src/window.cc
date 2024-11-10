@@ -34,6 +34,8 @@ void Window::init() {
     }
     glfwSwapInterval(1);
     glfwSetKeyCallback(_handle, &Window::keyCallback);
+    glfwSetMouseButtonCallback(_handle, &Window::mouseButtonCallback);
+    glfwSetCursorPosCallback(_handle, &Window::cursorPosCallback);
     if (!_glfwInit) {
         ImGui::CreateContext();
         ImGui_ImplOpenGL3_Init("#version 330 core");
@@ -87,11 +89,34 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action,
     }
 }
 
+void Window::mouseButtonCallback(GLFWwindow* window, int button, int action,
+                                 int mods) {
+    void* userPtr = glfwGetWindowUserPointer(window);
+    Window* pWindow = (Window*)userPtr;
+    if (action == GLFW_PRESS) {
+        pWindow->_mouseButtonStates[button] = true;
+    } else if (action == GLFW_RELEASE) {
+        pWindow->_mouseButtonStates[button] = false;
+    }
+}
+
+void Window::cursorPosCallback(GLFWwindow* window, double xpos, double ypos) {
+    void* userPtr = glfwGetWindowUserPointer(window);
+    Window* pWindow = (Window*)userPtr;
+    static double lastxpos = xpos;
+    static double lastypos = ypos;
+    pWindow->_cursorMove[0] += lastxpos - xpos;
+    pWindow->_cursorMove[1] += lastypos - ypos;
+    lastxpos = xpos;
+    lastypos = ypos;
+}
+
 void Window::makeContextCurrent() {
     glfwMakeContextCurrent(_handle);
 }
 
 void Window::pollEvents() {
+    _cursorMove = {0.0, 0.0};
     glfwPollEvents();
 }
 
@@ -113,6 +138,10 @@ void Window::TMPsetViewPortToWindow() {
 
 void Window::TMPclear() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+double Window::TMPgetTime() const {
+    return glfwGetTime();
 }
 } // namespace impl
 
@@ -152,11 +181,23 @@ const std::map<int, bool>& Window::keyStates() const {
     return _pImpl->keyStates();
 }
 
+const std::map<int, bool>& Window::mouseButtonStates() const {
+    return _pImpl->_mouseButtonStates;
+}
+
+const std::array<double, 2>& Window::cursorMove() const {
+    return _pImpl->_cursorMove;
+}
+
 void Window::TMPsetViewPortToWindow() {
     _pImpl->TMPsetViewPortToWindow();
 }
 
 void Window::TMPclear() {
     _pImpl->TMPclear();
+}
+
+double Window::TMPgetTime() const {
+    return _pImpl->TMPgetTime();
 }
 } // namespace compound

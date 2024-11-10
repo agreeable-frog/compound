@@ -19,10 +19,13 @@ public:
     void makeContextCurrent();
     void TMPsetViewPortToWindow();
     void TMPclear();
+    double TMPgetTime() const;
     void pollEvents();
     bool shouldClose() const;
     void swapBuffers();
     const std::map<int, bool>& keyStates() const;
+    const std::map<int, bool>& mouseButtonStates() const;
+    const std::array<double, 2>& cursorMove() const;
 
 private:
     log4cplus::Logger _logger =

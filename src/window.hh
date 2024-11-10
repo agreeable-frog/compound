@@ -11,6 +11,7 @@
 namespace compound::impl {
 class Window {
     friend ::compound::Window;
+
 public:
     Window(const std::string& name, size_t width, size_t height);
     Window(const Window&);
@@ -28,11 +29,17 @@ private:
     GLFWwindow* _handle;
     void init();
     std::map<int, bool> _keyStates;
+    std::map<int, bool> _mouseButtonStates;
+    std::array<double, 2> _cursorMove;
     static void keyCallback(GLFWwindow* window, int key, int scancode,
                             int action, int mods);
+    static void mouseButtonCallback(GLFWwindow* window, int button, int action,
+                                    int mods);
+    static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
     void makeContextCurrent();
     void TMPsetViewPortToWindow();
     void TMPclear();
+    double TMPgetTime() const;
     void pollEvents();
     bool shouldClose() const;
     void swapBuffers();

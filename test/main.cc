@@ -41,15 +41,66 @@ int main() {
                             glm::vec3{1.0f, 0.0f, 0.0f},
                             glm::vec3{0.0f, 0.0f, 1.0f}, 0.1f, 10.0f, M_PI_2);
     testProgram.bind();
-    testProgram.setUniform(0, camera.projection(1.5f));
-    testProgram.setUniform(1, camera.view());
+    int frameId = 0;
     while (!testWindow.shouldClose()) {
+        // Framerate limiter
+        static double lastFrameTime = testWindow.TMPgetTime();
+        static double lastCoutTime = lastFrameTime;
+        static int lastCoutFrameId = 0;
+        static float actualFps = 0.0f;
+        double currentTime = testWindow.TMPgetTime();
+        double deltaTime = currentTime - lastFrameTime;
+        if (deltaTime < (1.0 / 60.0)) {
+            continue;
+        }
+        if (currentTime - lastCoutTime > 0.5f) {
+            actualFps = float(frameId - lastCoutFrameId) * 2.0f;
+            lastCoutFrameId = frameId;
+            lastCoutTime = currentTime;
+        }
+        lastFrameTime = currentTime;
         testWindow.makeContextCurrent();
         testWindow.pollEvents();
+        {
+            auto keystates = testWindow.keyStates();
+            if (keystates[87]) { // forward
+                camera.move(camera.forward() * 1.0f * (float)deltaTime);
+            }
+            if (keystates[83]) { // backwards
+                camera.move(-camera.forward() * 1.0f * (float)deltaTime);
+            }
+            if (keystates[65]) { // left
+                camera.move(camera.left() * 1.0f * (float)deltaTime);
+            }
+            if (keystates[68]) { // right
+                camera.move(-camera.left() * 1.0f * (float)deltaTime);
+            }
+            if (keystates[32]) { // up
+                camera.move(camera.up() * 1.0f * (float)deltaTime);
+            }
+            if (keystates[340]) { // down
+                camera.move(-camera.up() * 1.0f * (float)deltaTime);
+            }
+            if (keystates[81]) {
+                camera.rotate(0.0f, 0.0f, -(float)deltaTime);
+            }
+            if (keystates[69]) {
+                camera.rotate(0.0f, 0.0f, (float)deltaTime);
+            }
+            auto mouseButtonStates = testWindow.mouseButtonStates();
+            if (mouseButtonStates[0]) {
+                auto cursorMove = testWindow.cursorMove();
+                camera.rotate((float)cursorMove[0] * -0.005f, (float)cursorMove[1] * -0.005f, 0.0f);
+            }
+        }
+        testProgram.setUniform(0, camera.projection(1.5f));
+        testProgram.setUniform(1, camera.view());
         testWindow.TMPsetViewPortToWindow();
         testWindow.TMPclear();
         testPipeline.drawElements(cube->nbIndices(), cube->indexBufferOffset());
         testWindow.swapBuffers();
+
+        ++frameId;
     }
     return 0;
 }

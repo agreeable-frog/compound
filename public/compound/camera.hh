@@ -11,6 +11,15 @@ public:
     glm::mat4 view() const;
     void move(glm::vec3 move);
     void rotate(float yaw, float pitch, float roll);
+    const glm::vec3 forward() const {
+        return _forward;
+    }
+    const glm::vec3 left() const {
+        return glm::cross(_up, _forward);
+    }
+    const glm::vec3 up() const {
+        return _up;
+    }
 
 private:
     glm::vec3 _position;
