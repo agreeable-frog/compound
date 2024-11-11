@@ -7,7 +7,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-message( STATUS "${PROJECT_NAME} Build type is : ${CMAKE_BUILD_TYPE}")
+message(STATUS "${PROJECT_NAME} Build type is : ${CMAKE_BUILD_TYPE}")
 
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 find_package(glfw3 REQUIRED)

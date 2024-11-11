@@ -18,6 +18,7 @@ namespace compound {
         ~Pipeline();
         void bind();
         void drawElements(size_t count, size_t offset);
+        void drawElementsInstanced(size_t count, size_t offset, size_t instanceCount);
         void setDoCullFace(bool);
         void setDoDepthTest(bool);
         void setClearColor(const glm::vec4&);

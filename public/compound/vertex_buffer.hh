@@ -11,16 +11,16 @@ class VertexBuffer;
 } // namespace impl
 struct Vertex {
     struct BindingDescriptor {
-        uint stride;
-        uint divisor;
+        uint stride = 0;
+        uint divisor = 0;
     };
     struct AttributeDescriptor {
-        uint location;
-        uint size;
+        uint location = 0;
+        uint size = 0;
         enum class Type { FLOAT };
-        Type type;
-        bool normalized;
-        size_t offset;
+        Type type = Type::FLOAT;
+        bool normalized = false;
+        size_t offset = 0;
     };
     struct Descriptor {
         BindingDescriptor bindingDescriptor;
