@@ -14,7 +14,7 @@ public:
     IndexBuffer(::compound::IndexBuffer::Usage);
     ~IndexBuffer();
     void bind();
-    bool isBound();
+    bool isBound() const;
     void bufferData(const std::vector<uint32_t>&);
 
 private:

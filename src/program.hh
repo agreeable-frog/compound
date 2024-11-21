@@ -5,7 +5,6 @@
 #include <string>
 #include <GL/glew.h>
 #include <GL/gl.h>
-#include <memory>
 
 namespace compound {
 namespace impl {
@@ -54,10 +53,8 @@ private:
         log4cplus::Logger::getInstance("compound.Program.private");
     GLuint _id;
     static GLuint _boundId;
-    std::shared_ptr<const ShaderModule> _pVertShader;
-    std::shared_ptr<const ShaderModule> _pFragShader;
-    Program(std::shared_ptr<const ShaderModule> pVertShader,
-            std::shared_ptr<const ShaderModule> pFragShader);
+    ShaderModule _vertShader;
+    ShaderModule _fragShader;
     void init();
     void destroy();
 };

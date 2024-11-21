@@ -85,8 +85,8 @@ GLuint Program::_boundId = 0;
 void Program::init() {
     _id = glCreateProgram();
     if (_id == 0) throw std::runtime_error("Program creation failed");
-    glAttachShader(_id, _pVertShader->_id);
-    glAttachShader(_id, _pFragShader->_id);
+    glAttachShader(_id, _vertShader._id);
+    glAttachShader(_id, _fragShader._id);
     glLinkProgram(_id);
     GLint linkStatus = GL_TRUE;
     glGetProgramiv(_id, GL_LINK_STATUS, &linkStatus);
@@ -111,31 +111,23 @@ bool Program::isBound() const {
     return _boundId == _id;
 }
 
-Program::Program(std::shared_ptr<const ShaderModule> pVertShader,
-                 std::shared_ptr<const ShaderModule> pFragShader)
-    : _pVertShader(pVertShader), _pFragShader(pFragShader) {
-    init();
-}
-
 Program::Program(const std::string& vertShaderPath,
                  const std::string& fragShaderPath)
-    : _pVertShader(std::make_shared<ShaderModule>(vertShaderPath,
-                                                  ShaderModule::Type::VERTEX)),
-      _pFragShader(std::make_shared<ShaderModule>(
-          fragShaderPath, ShaderModule::Type::FRAGMENT)) {
+    : _vertShader(vertShaderPath, ShaderModule::Type::VERTEX),
+      _fragShader(fragShaderPath, ShaderModule::Type::FRAGMENT) {
     init();
 }
 
 Program::Program(const Program& other)
-    : _pVertShader(other._pVertShader), _pFragShader(other._pFragShader) {
+    : _vertShader(other._vertShader), _fragShader(other._fragShader) {
     init();
 }
 
 Program& Program::operator=(const Program& other) {
     if (this == &other) return *this;
     destroy();
-    _pVertShader = other._pVertShader;
-    _pFragShader = other._pFragShader;
+    _vertShader = other._vertShader;
+    _fragShader = other._fragShader;
     init();
     return *this;
 }

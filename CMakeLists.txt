@@ -31,7 +31,8 @@ add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/index_buffer.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/object.cc)
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/object.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D_array.cc)
 
 add_library(bnahabra::renderer ALIAS ${PROJECT_NAME})
 

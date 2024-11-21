@@ -30,7 +30,7 @@ void IndexBuffer::bind() {
     }
 }
 
-bool IndexBuffer::isBound() {
+bool IndexBuffer::isBound() const {
     return _boundId == _id;
 }
 
@@ -42,7 +42,7 @@ void IndexBuffer::bufferData(const std::vector<uint32_t>& data) {
     if (!isBound()) {
         LOG4CPLUS_FATAL(_logger,
                         "Trying to buffer data in a not bound index buffer");
-        throw std::runtime_error("buffer data in not bound index buffer");
+        throw std::runtime_error("Trying to buffer data in a not bound index buffer");
     }
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.size() * sizeof(uint32_t), data.data(),
                  usageToGL[_usage]);
