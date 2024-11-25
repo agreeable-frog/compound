@@ -81,6 +81,7 @@ void VertexBuffer::attrib(const Pipeline& pipelineState,
 
 void VertexBuffer::bufferData(const void* data, size_t size,
                               ::compound::Vertex::Descriptor descriptor) {
+    // TODO : compare descriptor with _descriptor
     static std::map<::compound::VertexBuffer::Usage, GLenum> usageToGL = {
         {::compound::VertexBuffer::Usage::STATIC, GL_STATIC_DRAW},
         {::compound::VertexBuffer::Usage::STREAM, GL_STREAM_DRAW},

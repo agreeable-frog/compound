@@ -6,6 +6,7 @@
 #include "compound/mesh.hh"
 #include "compound/camera.hh"
 #include "compound/object.hh"
+#include "compound/texture_atlas.hh"
 
 #include <iostream>
 #include "log4cplus/configurator.h"
@@ -43,11 +44,36 @@ int main() {
     pInstanceBuffer->bind();
     pInstanceBuffer->attrib(testPipeline,
                             compound::ObjectVertex().getDescriptor());
+
+    std::shared_ptr<compound::TextureAtlas> atlas =
+        std::make_shared<compound::TextureAtlas>(1);
+    atlas->bind();
+    u_char* data = new u_char[4];
+    data[0] = 0;
+    data[1] = 255;
+    data[2] = 0;
+    data[3] = 255;
+    std::shared_ptr<compound::Texture> texture =
+        std::make_shared<compound::Texture>(1, 1, data);
+    u_char* data2 = new u_char[4];
+    data2[0] = 255;
+    data2[1] = 0;
+    data2[2] = 0;
+    data2[3] = 255;
+    std::shared_ptr<compound::Texture> texture2 =
+        std::make_shared<compound::Texture>(1, 1, data2);
+    std::shared_ptr<compound::Texture> texture3 =
+        std::make_shared<compound::Texture>(std::string(RESOURCES_PATH) +
+                                            "amiya.jpg");
+    atlas->addTexture(texture);
+    atlas->addTexture(texture2);
+    atlas->addTexture(texture3);
+    atlas->generate();
     std::vector<compound::Object> objects;
     for (size_t i = 0; i < 10; i++) {
-        auto cube =
-            compound::Object({0.0f + 4.0f * i, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f},
-                             {1.0f, 1.0f, 1.0f}, cubeMesh);
+        auto cube = compound::Object({0.0f + 4.0f * i, 0.0f, 0.0f},
+                                     {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f},
+                                     cubeMesh, i % 2 == 0 ? texture3 : texture2);
         objects.push_back(cube);
     }
 
@@ -101,8 +127,8 @@ int main() {
         testProgram.setUniform(1, camera.view());
         auto instanceVertices = std::vector<compound::ObjectVertex>();
         for (auto object : objects) {
-            instanceVertices.push_back(
-                compound::ObjectVertex(object.modelMatrix()));
+            instanceVertices.push_back(compound::ObjectVertex(
+                object.modelMatrix(), object.texture().lock()->atlasCoords()));
         }
         pInstanceBuffer->bufferData(
             instanceVertices.data(),

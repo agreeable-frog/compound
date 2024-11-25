@@ -32,7 +32,8 @@ add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/object.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D_array.cc)
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D_array.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_atlas.cc)
 
 add_library(bnahabra::renderer ALIAS ${PROJECT_NAME})
 
@@ -40,6 +41,7 @@ add_executable(test-${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/test/main.cc)
 
 target_compile_definitions(test-${PROJECT_NAME} PRIVATE SHADERS_PATH="${SHADERS_PATH}/")
 target_compile_definitions(test-${PROJECT_NAME} PRIVATE LOG4CPLUS_CONFIG="${CMAKE_CURRENT_SOURCE_DIR}/test/log4cplus.properties")
+target_compile_definitions(test-${PROJECT_NAME} PRIVATE RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/")
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/public)
