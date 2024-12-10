@@ -37,7 +37,11 @@ int main() {
                               compound::MeshVertex().getDescriptor());
     pTestIndexBuffer->bind();
     auto cubeMesh = std::make_shared<compound::Mesh>(compound::Mesh::Cube());
-    compound::Mesh::loadMeshes({cubeMesh}, pTestVertexBuffer, pTestIndexBuffer);
+    auto sphereMesh =
+        std::make_shared<compound::Mesh>(compound::Mesh::Sphere(16, 16));
+    auto planeMesh = std::make_shared<compound::Mesh>(compound::Mesh::Plane(8));
+    compound::Mesh::loadMeshes({cubeMesh, sphereMesh, planeMesh},
+                               pTestVertexBuffer, pTestIndexBuffer);
     compound::Camera camera(glm::vec3{0.0f, 0.0f, -4.0f},
                             glm::vec3{1.0f, 0.0f, 0.0f},
                             glm::vec3{0.0f, 0.0f, 1.0f}, 0.1f, 50.0f, M_PI_2);
@@ -48,34 +52,27 @@ int main() {
     std::shared_ptr<compound::TextureAtlas> atlas =
         std::make_shared<compound::TextureAtlas>(1);
     atlas->bind();
-    u_char* data = new u_char[4];
-    data[0] = 0;
-    data[1] = 255;
-    data[2] = 0;
-    data[3] = 255;
-    std::shared_ptr<compound::Texture> texture =
-        std::make_shared<compound::Texture>(1, 1, data);
-    u_char* data2 = new u_char[4];
-    data2[0] = 255;
-    data2[1] = 0;
-    data2[2] = 0;
-    data2[3] = 255;
     std::shared_ptr<compound::Texture> texture2 =
-        std::make_shared<compound::Texture>(1, 1, data2);
+        std::make_shared<compound::Texture>(std::string(RESOURCES_PATH) +
+                                            "grass_top.png");
     std::shared_ptr<compound::Texture> texture3 =
         std::make_shared<compound::Texture>(std::string(RESOURCES_PATH) +
-                                            "amiya.jpg");
-    atlas->addTexture(texture);
+                                            "log_oak.png");
     atlas->addTexture(texture2);
     atlas->addTexture(texture3);
     atlas->generate();
     std::vector<compound::Object> objects;
     for (size_t i = 0; i < 10; i++) {
-        auto cube = compound::Object({0.0f + 4.0f * i, 0.0f, 0.0f},
-                                     {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f},
-                                     cubeMesh, i % 2 == 0 ? texture3 : texture2);
+        auto cube = compound::Object(
+            {0.0f + 4.0f * i, 0.0f, 0.0f},
+            {M_PI_2 / 4 * i, M_PI_2 / 7 * i, M_PI_2 * i}, {1.0f, 1.0f, 1.0f},
+            i % 3 == 0 ? sphereMesh : cubeMesh,
+            i % 2 == 0 ? texture3 : texture2);
         objects.push_back(cube);
     }
+    objects.push_back(compound::Object({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f},
+                                       {1.0f, 1.0f, 1.0f}, planeMesh,
+                                       texture3));
 
     testProgram.bind();
     int frameId = 0;
@@ -125,20 +122,31 @@ int main() {
         }
         testProgram.setUniform(0, camera.projection(1.5f));
         testProgram.setUniform(1, camera.view());
-        auto instanceVertices = std::vector<compound::ObjectVertex>();
-        for (auto object : objects) {
-            instanceVertices.push_back(compound::ObjectVertex(
-                object.modelMatrix(), object.texture().lock()->atlasCoords()));
-        }
-        pInstanceBuffer->bufferData(
-            instanceVertices.data(),
-            instanceVertices.size() * compound::ObjectVertex().size(),
-            compound::ObjectVertex().getDescriptor());
         testWindow.TMPsetViewPortToWindow();
         testWindow.TMPclear();
-        testPipeline.drawElementsInstanced(cubeMesh->nbIndices(),
-                                           cubeMesh->indexBufferOffset(),
-                                           objects.size());
+        std::map<std::shared_ptr<compound::Mesh>,
+                 std::vector<const compound::Object*>>
+            instanceGroups;
+        for (auto& object : objects) {
+            if (object.mesh().expired()) continue;
+            instanceGroups[object.mesh().lock()].push_back(&object);
+        }
+        for (auto keyvalue : instanceGroups) {
+            auto mesh = keyvalue.first;
+            auto objects = keyvalue.second;
+            auto instanceVertices = std::vector<compound::ObjectVertex>();
+            for (const auto& object : objects) {
+                instanceVertices.push_back(compound::ObjectVertex(
+                    object->modelMatrix(),
+                    object->texture().lock()->atlasCoords()));
+            }
+            pInstanceBuffer->bufferData(
+                instanceVertices.data(),
+                instanceVertices.size() * compound::ObjectVertex().size(),
+                compound::ObjectVertex().getDescriptor());
+            testPipeline.drawElementsInstanced(
+                mesh->nbIndices(), mesh->indexBufferOffset(), objects.size());
+        }
         testWindow.swapBuffers();
 
         ++frameId;

@@ -1,5 +1,7 @@
 #include "compound/mesh.hh"
 
+#include <iostream>
+
 namespace compound {
 const Vertex::Descriptor MeshVertex::getDescriptor() const {
     Descriptor descriptor;
@@ -44,19 +46,19 @@ void Mesh::loadMeshes(std::vector<std::shared_ptr<Mesh>> meshes,
     std::vector<MeshVertex> vertexBufferData;
     std::vector<uint32_t> indexBufferData;
     for (auto& mesh : meshes) {
+        uint32_t offset = vertexBufferData.size();
         vertexBufferData.insert(vertexBufferData.end(), mesh->_vertices.begin(),
                                 mesh->_vertices.end());
-        uint32_t offset = indexBufferData.size();
         auto tmpIndexBufferData = mesh->_indices;
         std::transform(tmpIndexBufferData.begin(), tmpIndexBufferData.end(),
                        tmpIndexBufferData.begin(),
                        [offset](uint32_t i) { return i + offset; });
+        mesh->_indexBufferOffset = indexBufferData.size();
         indexBufferData.insert(indexBufferData.end(),
                                tmpIndexBufferData.begin(),
                                tmpIndexBufferData.end());
         mesh->_pVertexBuffer = pVertexBuffer;
         mesh->_pIndexBuffer = pIndexBuffer;
-        mesh->_indexBufferOffset = offset;
     }
     pVertexBuffer->bufferData(vertexBufferData.data(),
                               vertexBufferData.size() * MeshVertex().size(),
@@ -152,7 +154,7 @@ Mesh Mesh::Cube() {
     std::vector<uint32_t> indexFace6 = {20, 21, 23, 21, 22, 23};
     mesh._indices.insert(mesh._indices.end(), indexFace6.begin(),
                          indexFace6.end());
-    
+
     return mesh;
 }
 
@@ -160,9 +162,9 @@ Mesh Mesh::Sphere(size_t nRings, size_t nSegments) {
     Mesh mesh;
     for (size_t j = 0; j < nSegments; j++) {
         float theta = 2 * M_PI * float(j + 1) / float(nSegments);
-        mesh._vertices.push_back(MeshVertex{glm::vec3{0.0f, 1.0f, 0.0f},
-                                       glm::vec3{0.0f, 1.0f, 0.0f},
-                                       glm::vec2{0.0f, theta / (2 * M_PI)}});
+        mesh._vertices.push_back(
+            MeshVertex{glm::vec3{0.0f, 1.0f, 0.0f}, glm::vec3{0.0f, 1.0f, 0.0f},
+                       glm::vec2{0.0f, theta / (2 * M_PI)}});
     }
     for (size_t i = 0; i < nRings; i++) {
         float phi = M_PI * float(i + 1) / float(nRings);
@@ -192,6 +194,48 @@ Mesh Mesh::Sphere(size_t nRings, size_t nSegments) {
             mesh._indices.push_back(knext + nSegments);
             mesh._indices.push_back(k);
             mesh._indices.push_back(knext);
+        }
+    }
+    return mesh;
+}
+
+// TODO : move in utils header
+static glm::vec3 findOrthogonal(const glm::vec3 vec) {
+    // Gram-Schdmit
+    glm::vec3 a;
+    if (std::abs(vec[1]) < 0.001f && std::abs(vec[2]) < 0.001f) {
+        a = {0.0f, 1.0f, 0.0f};
+    } else {
+        a = {1.0f, 0.0f, 0.0f};
+    }
+    return glm::normalize(glm::cross(vec, a));
+}
+
+Mesh Mesh::Plane(size_t nSub) {
+    glm::vec3 axis = {1.0f, 0.0f, 0.0f};
+    glm::vec3 center = {0.0f, 0.0f, 0.0f};
+    float size = 1.0f;
+    Mesh mesh;
+    nSub % 2 == 0 ? nSub : nSub++;
+    glm::vec3 xAxis = findOrthogonal(glm::normalize(axis));
+    glm::vec3 yAxis = glm::normalize(glm::cross(xAxis, axis));
+    for (size_t i = 0; i < nSub; i++) {
+        for (size_t j = 0; j < nSub; j++) {
+            glm::vec3 pos = center + (float)(i - nSub / 2) / (nSub / 2) * xAxis * size +
+                            (float)(j - nSub / 2) / (nSub / 2) * yAxis * size;
+            mesh._vertices.push_back(MeshVertex(pos, glm::normalize(axis),
+                                                glm::vec2(i / nSub, j / nSub)));
+        }
+    }
+    for (size_t i = 0; i < nSub - 1; i++) {
+        for (size_t j = 0; j < nSub - 1; j++) {
+            mesh._indices.push_back(i * (nSub - 1) + j);
+            mesh._indices.push_back((i + 1) * (nSub - 1) + j);
+            mesh._indices.push_back((i + 1) * (nSub - 1) + j + 1);
+
+            mesh._indices.push_back((i + 1) * (nSub - 1) + j + 1);
+            mesh._indices.push_back(i * (nSub - 1) + j + 1);
+            mesh._indices.push_back(i * (nSub - 1) + j);
         }
     }
     return mesh;

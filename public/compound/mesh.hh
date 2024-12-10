@@ -31,6 +31,7 @@ public:
     static Mesh Triangle();
     static Mesh Cube();
     static Mesh Sphere(size_t nRings, size_t nSegments);
+    static Mesh Plane(size_t nSub);
     size_t nbIndices() const {
         return _indices.size();
     }

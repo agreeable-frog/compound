@@ -18,6 +18,7 @@ layout(location = 0) out vec2 uvOut;
 layout(location = 1) out vec3 atlasCoordsOut;
 
 void main() {
+    uvOut = uv;
     atlasCoordsOut = atlasCoords;
     gl_Position = proj * view * model * vec4(pos, 1.0);
 }
