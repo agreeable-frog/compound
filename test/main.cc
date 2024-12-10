@@ -39,7 +39,7 @@ int main() {
     auto cubeMesh = std::make_shared<compound::Mesh>(compound::Mesh::Cube());
     auto sphereMesh =
         std::make_shared<compound::Mesh>(compound::Mesh::Sphere(16, 16));
-    auto planeMesh = std::make_shared<compound::Mesh>(compound::Mesh::Plane(8));
+    auto planeMesh = std::make_shared<compound::Mesh>(compound::Mesh::Plane(16));
     compound::Mesh::loadMeshes({cubeMesh, sphereMesh, planeMesh},
                                pTestVertexBuffer, pTestIndexBuffer);
     compound::Camera camera(glm::vec3{0.0f, 0.0f, -4.0f},
@@ -70,8 +70,8 @@ int main() {
             i % 2 == 0 ? texture3 : texture2);
         objects.push_back(cube);
     }
-    objects.push_back(compound::Object({0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f},
-                                       {1.0f, 1.0f, 1.0f}, planeMesh,
+    objects.push_back(compound::Object({-1.0f, 0.0f, 0.0f}, {0.0f, M_PI_2, 0.0f},
+                                       {10.0f, 10.0f, 10.0f}, planeMesh,
                                        texture3));
 
     testProgram.bind();

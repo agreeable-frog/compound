@@ -199,43 +199,29 @@ Mesh Mesh::Sphere(size_t nRings, size_t nSegments) {
     return mesh;
 }
 
-// TODO : move in utils header
-static glm::vec3 findOrthogonal(const glm::vec3 vec) {
-    // Gram-Schdmit
-    glm::vec3 a;
-    if (std::abs(vec[1]) < 0.001f && std::abs(vec[2]) < 0.001f) {
-        a = {0.0f, 1.0f, 0.0f};
-    } else {
-        a = {1.0f, 0.0f, 0.0f};
-    }
-    return glm::normalize(glm::cross(vec, a));
-}
-
 Mesh Mesh::Plane(size_t nSub) {
-    glm::vec3 axis = {1.0f, 0.0f, 0.0f};
-    glm::vec3 center = {0.0f, 0.0f, 0.0f};
-    float size = 1.0f;
     Mesh mesh;
-    nSub % 2 == 0 ? nSub : nSub++;
-    glm::vec3 xAxis = findOrthogonal(glm::normalize(axis));
-    glm::vec3 yAxis = glm::normalize(glm::cross(xAxis, axis));
+    glm::vec3 xAxis = {1.0f, 0.0f, 0.0f};
+    glm::vec3 yAxis = {0.0f, 1.0f, 0.0f};
     for (size_t i = 0; i < nSub; i++) {
         for (size_t j = 0; j < nSub; j++) {
-            glm::vec3 pos = center + (float)(i - nSub / 2) / (nSub / 2) * xAxis * size +
-                            (float)(j - nSub / 2) / (nSub / 2) * yAxis * size;
-            mesh._vertices.push_back(MeshVertex(pos, glm::normalize(axis),
-                                                glm::vec2(i / nSub, j / nSub)));
+            float x = ((float)i - ((float)(nSub - 1)) / 2) / float(nSub - 1);
+            float y = ((float)j - ((float)(nSub - 1)) / 2) / float(nSub - 1);
+            glm::vec3 pos = x * xAxis + y * yAxis;
+            mesh._vertices.push_back(MeshVertex(
+                pos, glm::vec3{0.0f, 0.0f, 1.0f},
+                glm::vec2((float)i / (nSub - 1), (float)j / (nSub - 1))));
         }
     }
     for (size_t i = 0; i < nSub - 1; i++) {
         for (size_t j = 0; j < nSub - 1; j++) {
-            mesh._indices.push_back(i * (nSub - 1) + j);
-            mesh._indices.push_back((i + 1) * (nSub - 1) + j);
-            mesh._indices.push_back((i + 1) * (nSub - 1) + j + 1);
+            mesh._indices.push_back(i * nSub + j);
+            mesh._indices.push_back((i + 1) * nSub + j);
+            mesh._indices.push_back((i + 1) * nSub + j + 1);
 
-            mesh._indices.push_back((i + 1) * (nSub - 1) + j + 1);
-            mesh._indices.push_back(i * (nSub - 1) + j + 1);
-            mesh._indices.push_back(i * (nSub - 1) + j);
+            mesh._indices.push_back((i + 1) * nSub + j + 1);
+            mesh._indices.push_back(i * nSub + j + 1);
+            mesh._indices.push_back(i * nSub + j);
         }
     }
     return mesh;
