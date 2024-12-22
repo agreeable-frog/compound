@@ -41,12 +41,12 @@ void ShaderModule::init() {
         glGetShaderInfoLog(_id, logSize, &logSize, logData);
         LOG4CPLUS_FATAL(_logger, std::string("Failed to compile shader :\n") +
                                      std::string(logData));
-        delete logData;
-        delete data;
+        delete[] logData;
+        delete[] data;
         throw std::runtime_error("Failed to compile : " + _path);
     }
 
-    delete data;
+    delete[] data;
 }
 
 void ShaderModule::destroy() {

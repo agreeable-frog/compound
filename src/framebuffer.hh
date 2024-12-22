@@ -8,16 +8,22 @@
 namespace compound {
 namespace impl {
 class Framebuffer {
-//    friend ::compound::Framebuffer;
 public:
-    Framebuffer(size_t width, size_t height, size_t depth);
+    Framebuffer(GLsizei width, GLsizei height);
+    ~Framebuffer();
+    void bind();
+    bool isBound() const;
 
 private:
-    GLuint _id;
-    size_t _width;
-    size_t _height;
-    size_t _depth;
-    GLenum _format;
+    static GLuint _boundId;
+    log4cplus::Logger _logger =
+        log4cplus::Logger::getInstance("compound.Framebuffer.private");
+    GLuint _id = 0;
+    GLsizei _width = 0;
+    GLsizei _height = 0;
+    GLenum _format = 0;
+    void init();
+    void destroy();
 };
-}
-}
+} // namespace impl
+} // namespace compound
