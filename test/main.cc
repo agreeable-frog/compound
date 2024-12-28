@@ -6,6 +6,7 @@
 #include "compound/mesh.hh"
 #include "compound/camera.hh"
 #include "compound/object.hh"
+#include "compound/framebuffer.hh"
 #include "compound/texture_atlas.hh"
 
 #include <iostream>
@@ -39,7 +40,8 @@ int main() {
     auto cubeMesh = std::make_shared<compound::Mesh>(compound::Mesh::Cube());
     auto sphereMesh =
         std::make_shared<compound::Mesh>(compound::Mesh::Sphere(16, 16));
-    auto planeMesh = std::make_shared<compound::Mesh>(compound::Mesh::Plane(16));
+    auto planeMesh =
+        std::make_shared<compound::Mesh>(compound::Mesh::Plane(16));
     compound::Mesh::loadMeshes({cubeMesh, sphereMesh, planeMesh},
                                pTestVertexBuffer, pTestIndexBuffer);
     compound::Camera camera(glm::vec3{0.0f, 0.0f, -4.0f},
@@ -70,9 +72,17 @@ int main() {
             i % 2 == 0 ? texture3 : texture2);
         objects.push_back(cube);
     }
-    objects.push_back(compound::Object({-1.0f, 0.0f, 0.0f}, {0.0f, M_PI_2, 0.0f},
-                                       {10.0f, 10.0f, 10.0f}, planeMesh,
-                                       texture3));
+    objects.push_back(
+        compound::Object({-1.0f, 0.0f, 0.0f}, {0.0f, M_PI_2, 0.0f},
+                         {10.0f, 10.0f, 10.0f}, planeMesh, texture3));
+
+    compound::Framebuffer fb(900, 600);
+    compound::Renderbuffer color(900, 600,
+                                 compound::Renderbuffer::Format::COLOR);
+    color.bind();
+    fb.bind();
+    fb.attach(compound::Framebuffer::Attachment::COLOR_ATTACHMENT0, color);
+    fb.unbind();
 
     testProgram.bind();
     int frameId = 0;

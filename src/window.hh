@@ -7,6 +7,7 @@
 #include "log4cplus/logger.h"
 
 #include "imgui.h"
+#include "framebuffer.hh"
 
 namespace compound::impl {
 class Window {

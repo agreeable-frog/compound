@@ -27,7 +27,7 @@ private:
     static GLuint _boundId;
     bool _doCullFace = true;
     bool _doDepthTest = true;
-    glm::vec4 _clearColor = {0.0f, 0.0f, 0.0f, 0.0f};
+    glm::vec4 _clearColor = {0.0f, 0.0f, 0.0f, 255.0f};
     void init();
     void destroy();
 };

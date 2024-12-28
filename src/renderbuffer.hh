@@ -4,25 +4,27 @@
 #include "glm/glm.hpp"
 #include <GL/glew.h>
 #include <GL/gl.h>
+#include "compound/framebuffer.hh"
 
 namespace compound {
 namespace impl {
-class RenderBuffer {
+class Renderbuffer {
 public:
-    enum class Format { COLOR, DEPTH_STENCIL };
-    RenderBuffer(GLsizei width, GLsizei height, Format format);
+    Renderbuffer(GLsizei width, GLsizei height,
+                 ::compound::Renderbuffer::Format format);
     void bind();
+    GLuint id() const;
     bool isBound() const;
-    ~RenderBuffer();
+    ~Renderbuffer();
 
 private:
     log4cplus::Logger _logger =
-        log4cplus::Logger::getInstance("compound.RenderBuffer.private");
+        log4cplus::Logger::getInstance("compound.Renderbuffer.private");
     static GLuint _boundId;
     GLuint _id;
     GLsizei _width;
     GLsizei _height;
-    Format _format;
+    ::compound::Renderbuffer::Format _format;
     GLenum _GLformat;
     void init();
     void destroy();
