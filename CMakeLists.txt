@@ -35,7 +35,8 @@ add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D_array.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_atlas.cc
                                    ${CMAKE_CURRENT_SOURCE_DIR}/src/framebuffer.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/renderbuffer.cc)
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/renderbuffer.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D.cc)
 
 add_library(bnahabra::renderer ALIAS ${PROJECT_NAME})
 
