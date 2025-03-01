@@ -24,13 +24,27 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 set(SHADERS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 
-add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc)
+add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/program.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pipeline.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_buffer.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/index_buffer.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/object.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D_array.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_atlas.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/framebuffer.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/renderbuffer.cc
+                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D.cc)
+
 add_library(bnahabra::renderer ALIAS ${PROJECT_NAME})
 
 add_executable(test-${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/test/main.cc)
 
 target_compile_definitions(test-${PROJECT_NAME} PRIVATE SHADERS_PATH="${SHADERS_PATH}/")
 target_compile_definitions(test-${PROJECT_NAME} PRIVATE LOG4CPLUS_CONFIG="${CMAKE_CURRENT_SOURCE_DIR}/test/log4cplus.properties")
+target_compile_definitions(test-${PROJECT_NAME} PRIVATE RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/")
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/public)

@@ -7,7 +7,7 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build." FORCE)
 endif()
 
-message( STATUS "${PROJECT_NAME} Build type is : ${CMAKE_BUILD_TYPE}")
+message(STATUS "${PROJECT_NAME} Build type is : ${CMAKE_BUILD_TYPE}")
 
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 find_package(glfw3 REQUIRED)
@@ -15,7 +15,7 @@ find_package(glfw3 REQUIRED)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_library(${PROJECT_NAME} STATIC ${CMAKE_CURRENT_SOURCE_DIR}/imgui.cpp
+add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/imgui.cpp
                                    ${CMAKE_CURRENT_SOURCE_DIR}/imgui_demo.cpp
                                    ${CMAKE_CURRENT_SOURCE_DIR}/imgui_draw.cpp
                                    ${CMAKE_CURRENT_SOURCE_DIR}/imgui_impl_glfw.cpp
