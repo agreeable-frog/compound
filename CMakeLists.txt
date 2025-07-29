@@ -9,8 +9,8 @@ endif()
 
 message(STATUS "${PROJECT_NAME} Build type is : ${CMAKE_BUILD_TYPE}")
 
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/imgui)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src/stb)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/imgui)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/libs/stb)
 
 find_package(OpenGL REQUIRED COMPONENTS OpenGL)
 find_package(GLEW REQUIRED)
@@ -24,21 +24,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 set(SHADERS_PATH ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 
-add_library(${PROJECT_NAME} SHARED ${CMAKE_CURRENT_SOURCE_DIR}/src/window.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/program.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/pipeline.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/vertex_buffer.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/index_buffer.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/camera.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/object.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D_array.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_atlas.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/framebuffer.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/renderbuffer.cc
-                                   ${CMAKE_CURRENT_SOURCE_DIR}/src/texture_2D.cc)
-
-add_library(bnahabra::renderer ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME} SHARED )
 
 add_executable(test-${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/test/main.cc)
 
@@ -46,15 +32,15 @@ target_compile_definitions(test-${PROJECT_NAME} PRIVATE SHADERS_PATH="${SHADERS_
 target_compile_definitions(test-${PROJECT_NAME} PRIVATE LOG4CPLUS_CONFIG="${CMAKE_CURRENT_SOURCE_DIR}/test/log4cplus.properties")
 target_compile_definitions(test-${PROJECT_NAME} PRIVATE RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/test/")
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src)
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/public)
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface)
 
 if(TARGET glm::glm)
-set(${GLM_LIB} glm::glm)
+    set(${GLM_LIB} glm::glm)
 else()
-message(STATUS "Did not find imported target for glm")
-set(${GLM_LIB} glm)
+    message(STATUS "Did not find imported target for glm")
+    set(${GLM_LIB} glm)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PUBLIC ${GLM_LIB} Imgui::Imgui PRIVATE log4cplus::log4cplus stb::stb glfw ${CMAKE_DL_LIBS} ${OPENGL_LIBRARIES} GLEW::GLEW)
-target_link_libraries(test-${PROJECT_NAME} PRIVATE log4cplus::log4cplus ${PROJECT_NAME})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${GLM_LIB} PRIVATE Imgui::Imgui log4cplus::log4cplus stb::stb glfw ${CMAKE_DL_LIBS} ${OPENGL_LIBRARIES} GLEW::GLEW)
+target_link_libraries(test-${PROJECT_NAME} PUBLIC log4cplus::log4cplus ${PROJECT_NAME})
